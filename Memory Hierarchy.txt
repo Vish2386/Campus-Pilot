@@ -1,0 +1,48 @@
+Memory Hierarchy
+import java.util.Scanner;
+
+class MemoryHierarchy {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of memory levels (2 or 3): ");
+        int n = sc.nextInt();
+
+        double[] cost = new double[n];
+        double[] size = new double[n];
+        double[] hit = new double[n];
+        double[] access = new double[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Enter details for Level " + (i + 1) + ":");
+            System.out.print("Cost/bit (INR): ");
+            cost[i] = sc.nextDouble();
+            System.out.print("Size (bits): ");
+            size[i] = sc.nextDouble();
+            System.out.print("Hit ratio (Hi): ");
+            hit[i] = sc.nextDouble();
+            System.out.print("Access time (microseconds): ");
+            access[i] = sc.nextDouble();
+        }
+
+        double totalCost = 0, totalSize = 0;
+        for (int i = 0; i < n; i++) {
+            totalCost += cost[i] * size[i];
+            totalSize += size[i];
+        }
+        double avgCost = totalCost / totalSize;
+
+        double avgTime = 0;
+        if (n == 2) {
+            avgTime = (hit[0] * access[0]) + ((1 - hit[0]) * access[1]);
+        } else if (n == 3) {
+            avgTime = (hit[0] * access[0])
+                    + ((1 - hit[0]) * hit[1] * access[1])
+                    + ((1 - hit[0]) * (1 - hit[1]) * access[2]);
+        }
+
+        System.out.println("\n--- Results ---");
+        System.out.printf("Average cost/bit = %.6f INR\n", avgCost);
+        System.out.printf("Average access time = %.6f microseconds\n", avgTime);
+        sc.close();
+    }
+}

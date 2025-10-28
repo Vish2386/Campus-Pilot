@@ -1,0 +1,48 @@
+Restoring Division
+import java.util.Scanner;
+
+class RestoringDivision {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the Divisor (M) = ");
+        int divisor = sc.nextInt();
+        System.out.print("Enter the Dividend (Q) = ");
+        int dividend = sc.nextInt();
+
+        if (divisor == 0 || divisor < 0 || dividend < 0) {
+            System.out.println("Invalid input");
+            sc.close();
+            return;
+        }
+
+        int n = Integer.toBinaryString(Math.max(divisor, dividend)).length();
+
+        String Q = String.format("%" + n + "s", Integer.toBinaryString(dividend)).replace(' ', '0');
+        String M = String.format("%" + n + "s", Integer.toBinaryString(divisor)).replace(' ', '0');
+
+        System.out.println("Binary representation of Dividend (Q) = " + Q);
+        System.out.println("Binary representation of Divisor (M) = " + M);
+
+        int A = 0, Qreg = dividend, count = n;
+
+        while (count > 0) {
+            A = (A << 1) | ((Qreg >> (n - 1)) & 1);
+            Qreg = (Qreg << 1) & ((1 << n) - 1);
+            A -= divisor;
+            if (A < 0) {
+                Qreg &= ~1;
+                A += divisor;
+            } else {
+                Qreg |= 1;
+            }
+            count--;
+        }
+
+        String quotientBin = String.format("%" + n + "s", Integer.toBinaryString(Qreg)).replace(' ', '0');
+        String remainderBin = String.format("%" + n + "s", Integer.toBinaryString(A)).replace(' ', '0');
+
+        System.out.println("Quotient in binary = " + quotientBin);
+        System.out.println("Remainder in binary = " + remainderBin);
+        sc.close();
+    }
+}

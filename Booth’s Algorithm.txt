@@ -1,0 +1,51 @@
+Booth’s Algorithm import java.util.Scanner
+import java.util.Scanner;
+
+class exp4 {
+    public static String toBin(long v, int b) {
+        String s = Long.toBinaryString(v & ((1L << b) - 1));
+        while (s.length() < b) s = "0" + s;
+        return s;
+    }
+
+    public static void main(String[] a) {
+        Scanner s = new Scanner(System.in);
+        System.out.print("Enter the Multiplier (M): ");
+        int M = s.nextInt();
+        System.out.print("Enter the Multiplicand (Q): ");
+        int Q = s.nextInt();
+
+        int n = Math.max(Integer.toBinaryString(Math.abs(M)).length(),
+                Integer.toBinaryString(Math.abs(Q)).length()) + 1;
+
+        long mask = (1L << n) - 1;
+        long multiplicand = ((long) Q) & mask;
+        long multiplier = ((long) M) & mask;
+        long negM = (~multiplicand + 1) & mask;
+
+        long A = 0, Qreg = multiplier;
+        int Qm1 = 0, count = n;
+
+        System.out.println("Binary representation of Multiplicand (Q) = " + toBin(multiplicand, n));
+        System.out.println("Binary representation of Multiplier (M) = " + toBin(multiplier, n));
+
+        while (count-- > 0) {
+            int q0 = (int) (Qreg & 1L);
+            if (q0 == 0 && Qm1 == 1) A = (A + multiplicand) & mask;
+            else if (q0 == 1 && Qm1 == 0) A = (A + negM) & mask;
+
+            long a_lsb = A & 1L;
+            long newQ = (Qreg >>> 1) | (a_lsb << (n - 1));
+            int sign = (int) ((A >>> (n - 1)) & 1L);
+            long newA = (A >>> 1) | ((long) sign << (n - 1));
+
+            A = newA & mask;
+            Qreg = newQ & mask;
+            Qm1 = q0;
+        }
+
+        long result = (A << n) | Qreg;
+        System.out.println("Result of multiplication in binary = " + toBin(result, 2 * n));
+        s.close();
+    }
+}

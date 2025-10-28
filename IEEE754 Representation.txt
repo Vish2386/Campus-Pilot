@@ -1,0 +1,130 @@
+IEEE754 Representation import java.util.Scanner;
+
+import java.util.Scanner;
+import java.math.BigInteger;
+
+class exp3 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter decimal number: ");
+        double num = sc.nextDouble();
+        System.out.println("Select format:");
+        System.out.println("1. 32-bit");
+        System.out.println("2. 64-bit");
+        System.out.println("3. 80-bit");
+        System.out.println("4. All");
+        int choice = sc.nextInt();
+        switch (choice) {
+            case 1 -> convertIEEE(num, 32);
+            case 2 -> convertIEEE(num, 64);
+            case 3 -> convertIEEE(num, 80);
+            case 4 -> {
+                convertIEEE(num, 32);
+                convertIEEE(num, 64);
+                convertIEEE(num, 80);
+            }
+            default -> System.out.println("Invalid choice");
+        }
+        sc.close();
+    }
+
+    static void convertIEEE(double num, int bits) {
+        int signBit = num < 0 ? 1 : 0;
+        num = Math.abs(num);
+
+        if (num == 0.0) {
+            int expBits = bits == 32 ? 8 : (bits == 64 ? 11 : 15);
+            int mantissaBits = bits == 32 ? 23 : (bits == 64 ? 52 : 64);
+            String expBin = "0".repeat(expBits);
+            String mantissa = "0".repeat(mantissaBits);
+            String finalBin = signBit + expBin + mantissa;
+            String hex = String.format("%" + (bits / 4) + "s",
+                    new BigInteger(finalBin, 2).toString(16).toUpperCase()).replace(' ', '0');
+            System.out.println("\n=== " + bits + "-bit IEEE 754 Representation ===");
+            System.out.println("Given number in Binary = 0.0");
+            System.out.println("Scientific Notation = 0");
+            System.out.println("Real Exponent = 0");
+            System.out.println("Biased Exponent = 0 = " + expBin);
+            System.out.println("Mantissa = " + mantissa);
+            System.out.println(bits + " bit representation = " + finalBin);
+            System.out.println("Hex representation = " + hex);
+            return;
+        }
+
+        long intPart = (long) Math.floor(num);
+        double fracPart = num - intPart;
+
+        String intPartBin = Long.toBinaryString(intPart);
+
+        StringBuilder fracBin = new StringBuilder();
+        int guardLen = 70;
+        while (fracPart > 0 && fracBin.length() < guardLen) {
+            fracPart *= 2.0;
+            int bit = (int) Math.floor(fracPart);
+            fracBin.append(bit == 1 ? '1' : '0');
+            if (bit == 1) fracPart -= 1.0;
+        }
+
+        int expBits;
+        int mantissaBits;
+        int bias;
+        if (bits == 32) {
+            expBits = 8;
+            mantissaBits = 23;
+            bias = 127;
+        } else if (bits == 64) {
+            expBits = 11;
+            mantissaBits = 52;
+            bias = 1023;
+        } else {
+            expBits = 15;
+            mantissaBits = 64;
+            bias = 16383;
+        }
+
+        int realExp;
+        String mantissaSrc;
+        if (!intPartBin.equals("0")) {
+            realExp = intPartBin.length() - 1;
+            mantissaSrc = intPartBin.substring(1) + fracBin;
+        } else {
+            int firstOne = fracBin.indexOf("1");
+            if (firstOne == -1) {
+                realExp = 0;
+                mantissaSrc = "0".repeat(mantissaBits);
+            } else {
+                realExp = -(firstOne + 1);
+                mantissaSrc = fracBin.substring(firstOne + 1);
+            }
+        }
+
+        String mantissa;
+        if (mantissaSrc.length() >= mantissaBits) {
+            mantissa = mantissaSrc.substring(0, mantissaBits);
+        } else {
+            mantissa = mantissaSrc + "0".repeat(mantissaBits - mantissaSrc.length());
+        }
+
+        int biasedExp = realExp + bias;
+        if (biasedExp < 0) biasedExp = 0;
+
+        String expBin = String.format("%" + expBits + "s",
+                Integer.toBinaryString(biasedExp)).replace(' ', '0');
+
+        String finalBin = signBit + expBin + mantissa;
+
+        String binaryDisp = intPartBin + "." + fracBin;
+
+        String hex = String.format("%" + (bits / 4) + "s",
+                new BigInteger(finalBin, 2).toString(16).toUpperCase()).replace(' ', '0');
+
+        System.out.println("\n=== " + bits + "-bit IEEE 754 Representation ===");
+        System.out.println("Given number in Binary = " + binaryDisp);
+        System.out.println("Scientific Notation = 1." + mantissa + " * 2^" + realExp);
+        System.out.println("Real Exponent = " + realExp);
+        System.out.println("Biased Exponent = " + biasedExp + " = " + expBin);
+        System.out.println("Mantissa = " + mantissa);
+        System.out.println(bits + " bit representation = " + finalBin);
+        System.out.println("Hex representation = " + hex);
+    }
+}

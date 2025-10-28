@@ -1,0 +1,54 @@
+Cache mapping
+import java.util.Scanner;
+
+class CacheMapping {
+    private static int log2Ceil(int x) {
+        if (x <= 1) return 0;
+        int floor = 31 - Integer.numberOfLeadingZeros(x);
+        return (1 << floor) == x ? floor : floor + 1;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter cache memory size (in KB): ");
+        int cacheKB = sc.nextInt();
+        int cacheSize = cacheKB * 1024;
+
+        System.out.print("Enter main memory size (in MB): ");
+        int mainMB = sc.nextInt();
+        int mainSize = mainMB * 1024 * 1024;
+
+        System.out.print("Enter cache line size (in Bytes): ");
+        int lineSize = sc.nextInt();
+
+        int addressBits = log2Ceil(mainSize);
+        int numBanks = 1;
+        int cacheLines = cacheSize / lineSize;
+        int mainBlocks = mainSize / lineSize;
+        int byteBits = log2Ceil(lineSize);
+        int lineBits = log2Ceil(cacheLines);
+        int tagBits = addressBits - (byteBits + lineBits);
+
+        System.out.println("\n--- Illustration and Expected Output ---");
+        System.out.println("Size of Cache memory = " + cacheKB + " KB");
+        System.out.println("Size of Main memory = " + mainMB + " MB");
+        System.out.println("Main memory address = " + addressBits + " bits");
+        System.out.println("Size of each cache line = " + lineSize + " Bytes");
+        System.out.println("Select cache mapping policy: Direct mapping");
+        System.out.println("Number of cache banks = " + numBanks);
+        System.out.println("Cache lines per cache bank = " + cacheLines + " (Line No-0 to Line No-" + (cacheLines - 1) + ")");
+        System.out.println("Number of main memory blocks = " + mainBlocks + " (Block No-0 to Block No-" + (mainBlocks - 1) + ")");
+        System.out.println("Main memory address of " + addressBits + " bits is interpreted in 3 fields as below:");
+        System.out.println("LSB " + byteBits + " bits for Byte selection");
+        System.out.println("Middle " + lineBits + " bits for Cache line selection");
+        System.out.println("MSB " + tagBits + " bits (remaining) for the Tags");
+
+        System.out.print("\nEnter a main memory block number: ");
+        int blockNum = sc.nextInt();
+        int mappedLine = blockNum % cacheLines;
+        System.out.println("Block " + blockNum + " is mapped into cache line number = " + mappedLine);
+
+        sc.close();
+    }
+}

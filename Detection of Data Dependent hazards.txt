@@ -1,0 +1,47 @@
+Detection of Data Dependent hazards in linear pipeline
+import java.util.Scanner;
+
+public class Main {
+    static class Instruction {
+        String source;
+        String destination;
+
+        Instruction(String source, String destination) {
+            this.source = source.toUpperCase();
+            this.destination = destination.toUpperCase();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Detection of Data Dependent Hazards in a Linear Pipeline");
+        System.out.println("--------------------------------------------------------");
+        System.out.print("Enter source of Instruction I1: ");
+        String s1 = sc.next();
+        System.out.print("Enter destination of Instruction I1: ");
+        String d1 = sc.next();
+        System.out.print("Enter source of Instruction I2: ");
+        String s2 = sc.next();
+        System.out.print("Enter destination of Instruction I2: ");
+        String d2 = sc.next();
+
+        Instruction I1 = new Instruction(s1, d1);
+        Instruction I2 = new Instruction(s2, d2);
+
+        System.out.println("\nResult:");
+        detectHazard(I1, I2);
+        sc.close();
+    }
+
+    static void detectHazard(Instruction I1, Instruction I2) {
+        if (I1.destination.equals(I2.source)) {
+            System.out.println("RAW Hazard detected (Read After Write)");
+        } else if (I1.source.equals(I2.destination)) {
+            System.out.println("WAR Hazard detected (Write After Read)");
+        } else if (I1.destination.equals(I2.destination)) {
+            System.out.println("WAW Hazard detected (Write After Write)");
+        } else {
+            System.out.println("No Data Dependency Hazard detected");
+        }
+    }
+}
